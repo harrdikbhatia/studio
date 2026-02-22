@@ -11,6 +11,7 @@ interface Slot {
 }
 
 // Generate 20 slots for Section A and 20 for Section B
+// IDs are formatted as A01, A02... B01, B02... for consistent matching
 const BASE_SLOTS: Omit<Slot, "status">[] = [
   // Section A: Slots A01 - A20
   ...Array.from({ length: 20 }, (_, i) => ({
@@ -36,10 +37,10 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
   const [slots, setSlots] = useState<Slot[]>([]);
 
   useEffect(() => {
-    // Generate status randomly on mount
+    // Generate status randomly on mount to simulate real sensor data
     const randomizedSlots: Slot[] = BASE_SLOTS.map((slot) => ({
       ...slot,
-      // Ensure the selected slot is "available" so we can see the transition
+      // Randomly assign some slots as occupied, keeping target available initially
       status: Math.random() > 0.3 ? "available" : "occupied",
     }));
     setSlots(randomizedSlots);
@@ -81,7 +82,7 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
                   strokeWidth="2"
                   className={cn(
                     "transition-all duration-500",
-                    isParked ? "parking-slot-parked" : 
+                    isParked ? "parking-slot-occupied" : 
                     isSelected ? "parking-slot-selected" : 
                     isOccupied ? "parking-slot-occupied" : "parking-slot-available"
                   )}
@@ -93,7 +94,7 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
                   fontSize="12"
                   className={cn(
                     "font-bold select-none transition-colors duration-500",
-                    isParked || isSelected ? "fill-white" : (isOccupied ? "fill-muted-foreground/50" : "fill-primary")
+                    isParked || isOccupied ? "fill-muted-foreground/50" : (isSelected ? "fill-white" : "fill-primary")
                   )}
                 >
                   {slot.id}
@@ -117,10 +118,6 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
       </svg>
 
       <div className="absolute top-4 right-4 flex flex-col gap-2 bg-white/80 backdrop-blur p-2 rounded-lg border shadow-sm z-10">
-        <div className="flex items-center gap-2 text-[10px] font-bold">
-          <div className="w-2 h-2 bg-green-500 rounded-sm" />
-          <span>Parked</span>
-        </div>
         <div className="flex items-center gap-2 text-[10px] font-bold">
           <div className="w-2 h-2 bg-accent rounded-sm" />
           <span>Navigating</span>
