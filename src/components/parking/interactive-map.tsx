@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 
 interface Slot {
   id: string;
@@ -11,11 +10,10 @@ interface Slot {
   status: "available" | "occupied";
 }
 
-const MOCK_SLOTS: Slot[] = Array.from({ length: 20 }, (_, i) => ({
+const BASE_SLOTS: Omit<Slot, "status">[] = Array.from({ length: 20 }, (_, i) => ({
   id: `A${i + 1}`,
   x: (i % 5) * 60 + 20,
   y: Math.floor(i / 5) * 80 + 20,
-  status: Math.random() > 0.3 ? "available" : "occupied",
 }));
 
 interface InteractiveMapProps {
@@ -24,6 +22,17 @@ interface InteractiveMapProps {
 }
 
 export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapProps) {
+  const [slots, setSlots] = useState<Slot[]>([]);
+
+  useEffect(() => {
+    // Generate status randomly only on the client side after hydration
+    const randomizedSlots: Slot[] = BASE_SLOTS.map((slot) => ({
+      ...slot,
+      status: Math.random() > 0.3 ? "available" : "occupied",
+    }));
+    setSlots(randomizedSlots);
+  }, []);
+
   return (
     <div className="relative w-full aspect-[4/3] bg-muted/5 rounded-xl border-2 border-dashed border-muted flex items-center justify-center p-4">
       <svg
@@ -42,43 +51,58 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapP
         <path d="M 340 100 L 350 120 L 340 140" fill="none" stroke="#94a3b8" strokeWidth="2" />
 
         {/* Slots */}
-        {MOCK_SLOTS.map((slot) => {
-          const isSelected = selectedSlotId === slot.id;
-          const isOccupied = slot.status === "occupied";
-          
-          return (
-            <g
-              key={slot.id}
-              onClick={() => !isOccupied && onSelectSlot(slot.id)}
-              className="cursor-pointer"
-            >
-              <rect
-                x={slot.x}
-                y={slot.y}
-                width="45"
-                height="65"
-                rx="4"
-                strokeWidth="2"
-                className={cn(
-                  "transition-all duration-300",
-                  isOccupied ? "parking-slot-occupied" : (isSelected ? "parking-slot-selected" : "parking-slot-available")
-                )}
-              />
-              <text
-                x={slot.x + 22.5}
-                y={slot.y + 40}
-                textAnchor="middle"
-                fontSize="10"
-                className={cn(
-                  "font-bold select-none",
-                  isSelected ? "fill-white" : (isOccupied ? "fill-muted-foreground/50" : "fill-primary")
-                )}
+        {slots.length > 0 ? (
+          slots.map((slot) => {
+            const isSelected = selectedSlotId === slot.id;
+            const isOccupied = slot.status === "occupied";
+            
+            return (
+              <g
+                key={slot.id}
+                onClick={() => !isOccupied && onSelectSlot(slot.id)}
+                className="cursor-pointer"
               >
-                {slot.id}
-              </text>
-            </g>
-          );
-        })}
+                <rect
+                  x={slot.x}
+                  y={slot.y}
+                  width="45"
+                  height="65"
+                  rx="4"
+                  strokeWidth="2"
+                  className={cn(
+                    "transition-all duration-300",
+                    isOccupied ? "parking-slot-occupied" : (isSelected ? "parking-slot-selected" : "parking-slot-available")
+                  )}
+                />
+                <text
+                  x={slot.x + 22.5}
+                  y={slot.y + 40}
+                  textAnchor="middle"
+                  fontSize="10"
+                  className={cn(
+                    "font-bold select-none",
+                    isSelected ? "fill-white" : (isOccupied ? "fill-muted-foreground/50" : "fill-primary")
+                  )}
+                >
+                  {slot.id}
+                </text>
+              </g>
+            );
+          })
+        ) : (
+          /* Placeholder / Loading State for SSR */
+          BASE_SLOTS.map((slot) => (
+            <rect
+              key={`placeholder-${slot.id}`}
+              x={slot.x}
+              y={slot.y}
+              width="45"
+              height="65"
+              rx="4"
+              className="fill-muted animate-pulse"
+            />
+          ))
+        )}
       </svg>
 
       <div className="absolute top-4 right-4 flex flex-col gap-2">
