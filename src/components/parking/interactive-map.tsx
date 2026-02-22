@@ -10,11 +10,21 @@ interface Slot {
   status: "available" | "occupied";
 }
 
-const BASE_SLOTS: Omit<Slot, "status">[] = Array.from({ length: 20 }, (_, i) => ({
-  id: `A${i + 1}`,
-  x: (i % 5) * 60 + 20,
-  y: Math.floor(i / 5) * 80 + 20,
-}));
+// Generate slots for Section A (Top) and Section B (Bottom)
+const BASE_SLOTS: Omit<Slot, "status">[] = [
+  // Section A: 10 slots (2 rows of 5)
+  ...Array.from({ length: 10 }, (_, i) => ({
+    id: `A${i + 1}`,
+    x: (i % 5) * 65 + 15,
+    y: Math.floor(i / 5) * 75 + 15,
+  })),
+  // Section B: 10 slots (2 rows of 5)
+  ...Array.from({ length: 10 }, (_, i) => ({
+    id: `B${i + 1}`,
+    x: (i % 5) * 65 + 15,
+    y: Math.floor(i / 5) * 75 + 195,
+  })),
+];
 
 interface InteractiveMapProps {
   onSelectSlot: (slotId: string) => void;
@@ -43,12 +53,15 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapP
         {/* Parking Lot Structure */}
         <rect x="0" y="0" width="350" height="350" fill="#f8fafc" rx="10" />
         
-        {/* Driveways */}
-        <rect x="0" y="100" width="350" height="40" fill="#e2e8f0" />
-        <rect x="0" y="220" width="350" height="40" fill="#e2e8f0" />
-
+        {/* Central Driveway */}
+        <rect x="0" y="160" width="350" height="30" fill="#e2e8f0" />
+        
         {/* Entrance Marker */}
-        <path d="M 340 100 L 350 120 L 340 140" fill="none" stroke="#94a3b8" strokeWidth="2" />
+        <path d="M 340 160 L 350 175 L 340 190" fill="none" stroke="#94a3b8" strokeWidth="2" />
+
+        {/* Section Labels */}
+        <text x="5" y="12" fontSize="8" className="fill-muted-foreground font-bold uppercase tracking-widest">Section A</text>
+        <text x="5" y="192" fontSize="8" className="fill-muted-foreground font-bold uppercase tracking-widest">Section B</text>
 
         {/* Slots */}
         {slots.length > 0 ? (
@@ -65,8 +78,8 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapP
                 <rect
                   x={slot.x}
                   y={slot.y}
-                  width="45"
-                  height="65"
+                  width="50"
+                  height="60"
                   rx="4"
                   strokeWidth="2"
                   className={cn(
@@ -75,8 +88,8 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapP
                   )}
                 />
                 <text
-                  x={slot.x + 22.5}
-                  y={slot.y + 40}
+                  x={slot.x + 25}
+                  y={slot.y + 35}
                   textAnchor="middle"
                   fontSize="10"
                   className={cn(
@@ -96,8 +109,8 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapP
               key={`placeholder-${slot.id}`}
               x={slot.x}
               y={slot.y}
-              width="45"
-              height="65"
+              width="50"
+              height="60"
               rx="4"
               className="fill-muted animate-pulse"
             />
@@ -105,17 +118,17 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapP
         )}
       </svg>
 
-      <div className="absolute top-4 right-4 flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-xs">
-          <div className="w-3 h-3 bg-accent rounded-sm" />
+      <div className="absolute top-4 right-4 flex flex-col gap-2 bg-white/80 backdrop-blur p-2 rounded-lg border shadow-sm">
+        <div className="flex items-center gap-2 text-[10px] font-bold">
+          <div className="w-2 h-2 bg-accent rounded-sm" />
           <span>Selected</span>
         </div>
-        <div className="flex items-center gap-2 text-xs">
-          <div className="w-3 h-3 bg-accent/20 border border-accent rounded-sm" />
+        <div className="flex items-center gap-2 text-[10px] font-bold">
+          <div className="w-2 h-2 bg-accent/20 border border-accent rounded-sm" />
           <span>Available</span>
         </div>
-        <div className="flex items-center gap-2 text-xs">
-          <div className="w-3 h-3 bg-muted border border-muted-foreground rounded-sm" />
+        <div className="flex items-center gap-2 text-[10px] font-bold">
+          <div className="w-2 h-2 bg-muted border border-muted-foreground rounded-sm" />
           <span>Occupied</span>
         </div>
       </div>
