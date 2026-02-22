@@ -1,15 +1,19 @@
+
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Download, Share2, Info, MapPin, Clock } from "lucide-react";
+import { ChevronLeft, Info, Navigation, CheckCircle2, QrCode } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function ReservationDetail({ params }: { params: { id: string } }) {
   const [countdown, setCountdown] = useState(15 * 60);
+  const [isScanning, setIsScanning] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -22,6 +26,13 @@ export default function ReservationDetail({ params }: { params: { id: string } }
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
+
+  const simulateGateScan = () => {
+    setIsScanning(true);
+    setTimeout(() => {
+      router.push(`/guidance/${params.id}`);
+    }, 1500);
   };
 
   return (
@@ -42,17 +53,24 @@ export default function ReservationDetail({ params }: { params: { id: string } }
             <CardTitle className="text-sm font-mono">{params.id}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center py-10">
-            {/* Visual representation of a QR code using a placeholder or SVG */}
-            <div className="relative w-64 h-64 bg-white p-4 rounded-xl border-2 border-primary mb-6 shadow-inner">
-               <Image 
+            <div className="relative w-64 h-64 bg-white p-4 rounded-xl border-2 border-primary mb-6 shadow-inner group">
+              <Image 
                 src={`https://picsum.photos/seed/${params.id}/256/256`} 
                 alt="QR Code" 
                 width={256} 
                 height={256}
-                className="mix-blend-multiply opacity-90"
+                className="mix-blend-multiply opacity-90 transition-transform group-hover:scale-105"
                 data-ai-hint="qr code"
               />
               <div className="absolute inset-0 border-8 border-white pointer-events-none" />
+              {isScanning && (
+                <div className="absolute inset-0 bg-accent/80 flex items-center justify-center animate-in fade-in duration-300">
+                  <div className="text-center text-white">
+                    <CheckCircle2 className="h-12 w-12 mx-auto mb-2 animate-bounce" />
+                    <p className="font-bold">Gate Verified</p>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="flex flex-col items-center gap-2">
@@ -64,33 +82,37 @@ export default function ReservationDetail({ params }: { params: { id: string } }
           </CardContent>
           <div className="bg-primary text-white p-6 grid grid-cols-2 gap-4">
             <div className="flex flex-col">
-              <span className="text-[10px] text-white/50 uppercase">Slot Number</span>
+              <span className="text-[10px] text-white/50 uppercase">Assigned Slot</span>
               <span className="font-bold text-xl">A12</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] text-white/50 uppercase">Level</span>
-              <span className="font-bold text-xl">Basement 1</span>
+              <span className="text-[10px] text-white/50 uppercase">Guidance System</span>
+              <span className="font-bold text-xl">Active</span>
             </div>
           </div>
         </Card>
 
-        <div className="flex gap-4">
-          <Button variant="outline" className="flex-1">
-            <Download className="mr-2 h-4 w-4" /> Download
-          </Button>
-          <Button variant="outline" className="flex-1">
-            <Share2 className="mr-2 h-4 w-4" /> Share
-          </Button>
-        </div>
+        <Button 
+          onClick={simulateGateScan} 
+          disabled={isScanning}
+          className="w-full h-14 bg-accent hover:bg-accent/90 text-white font-bold text-lg shadow-lg"
+        >
+          {isScanning ? "Processing..." : (
+            <>
+              <QrCode className="mr-2 h-5 w-5" />
+              Simulate Gate Scan
+            </>
+          )}
+        </Button>
 
         <Card className="bg-accent/5 border-none">
           <CardContent className="flex gap-3 py-4 items-start">
             <Info className="h-5 w-5 text-accent shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="font-bold text-accent">Gate Entry Logic</p>
+              <p className="font-bold text-accent">Sensor Sync Activated</p>
               <p className="text-muted-foreground text-xs leading-relaxed">
-                Ensure your screen brightness is at maximum. Hold your phone 10-15cm away from the scanner.
-                Need help? Press the intercom button at the kiosk.
+                Once scanned, your dashboard will transition to <b>Live Sensor Guidance</b>.
+                Sensors in the garage floor will light up to lead you directly to Slot A12.
               </p>
             </div>
           </CardContent>
