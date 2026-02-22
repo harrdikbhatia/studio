@@ -45,7 +45,7 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
   }, []);
 
   return (
-    <div className="relative w-full aspect-[3/4] bg-muted/5 rounded-xl border-2 border-dashed border-muted flex items-center justify-center p-4">
+    <div className="relative w-full aspect-[35/55] bg-muted/5 rounded-xl border-2 border-dashed border-muted flex items-center justify-center p-4 overflow-hidden">
       <svg
         viewBox="0 0 350 550"
         className="w-full h-full max-w-md drop-shadow-lg"
