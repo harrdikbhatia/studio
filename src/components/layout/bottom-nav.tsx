@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Map, LayoutDashboard, Calendar, BrainCircuit, User } from "lucide-react";
+import { Map, LayoutDashboard, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function BottomNav() {
@@ -11,7 +11,6 @@ export function BottomNav() {
   const navItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
     { href: "/map", icon: Map, label: "Map" },
-    { href: "/predict", icon: BrainCircuit, label: "AI Predict" },
     { href: "/admin", icon: User, label: "Admin" },
   ];
 

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, QrCode, Clock, Sparkles, BrainCircuit, ChevronRight } from "lucide-react";
+import { MapPin, QrCode, Clock, Sparkles, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 export default function Dashboard() {
@@ -74,23 +74,8 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* AI & Insights Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Link href="/predict">
-            <Card className="hover:border-accent transition-all cursor-pointer group h-full">
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0 transition-colors group-hover:bg-accent group-hover:text-white">
-                  <BrainCircuit className="h-6 w-6" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg">AI Peak Prediction</h3>
-                  <p className="text-xs text-muted-foreground">Analyze trends for the best arrival time</p>
-                </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-transform group-hover:translate-x-1" />
-              </CardContent>
-            </Card>
-          </Link>
-
+        {/* AI & Insights Section - Simplified */}
+        <div className="grid grid-cols-1 gap-6">
           <Card className="bg-muted/30 border-none">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-4">

@@ -17,7 +17,6 @@ export default function AuthLayout({
         <div className="hidden md:flex gap-6 text-sm font-medium">
           <Link href="/dashboard" className="hover:text-accent transition-colors">Dashboard</Link>
           <Link href="/map" className="hover:text-accent transition-colors">Find Parking</Link>
-          <Link href="/predict" className="hover:text-accent transition-colors">AI Prediction</Link>
           <Link href="/admin" className="hover:text-accent transition-colors">Admin</Link>
         </div>
         <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold">
