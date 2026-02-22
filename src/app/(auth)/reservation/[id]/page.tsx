@@ -1,11 +1,10 @@
-
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, use } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Info, Navigation, CheckCircle2, QrCode, MapPin, ArrowRight } from "lucide-react";
+import { ChevronLeft, Info, CheckCircle2, QrCode, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -17,7 +16,8 @@ const NEAREST_SLOTS = [
   { id: "B04", distance: "45m", level: "L1", type: "Standard" },
 ];
 
-export default function ReservationDetail({ params }: { params: { id: string } }) {
+export default function ReservationDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [countdown, setCountdown] = useState(15 * 60);
   const [step, setStep] = useState<"qr" | "scanning" | "select">("qr");
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -45,7 +45,7 @@ export default function ReservationDetail({ params }: { params: { id: string } }
 
   const handleStartGuidance = () => {
     if (selectedSlot) {
-      router.push(`/guidance/${params.id}?slot=${selectedSlot}`);
+      router.push(`/guidance/${id}?slot=${selectedSlot}`);
     }
   };
 
@@ -73,12 +73,12 @@ export default function ReservationDetail({ params }: { params: { id: string } }
         {step !== "select" ? (
           <Card className="border-2 border-accent/20 overflow-hidden shadow-xl">
             <CardHeader className="bg-muted/5 border-b text-center py-4">
-              <CardTitle className="text-sm font-mono">{params.id}</CardTitle>
+              <CardTitle className="text-sm font-mono">{id}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center py-10">
               <div className="relative w-64 h-64 bg-white p-4 rounded-xl border-2 border-primary mb-6 shadow-inner group">
                 <Image 
-                  src={`https://picsum.photos/seed/${params.id}/256/256`} 
+                  src={`https://picsum.photos/seed/${id}/256/256`} 
                   alt="QR Code" 
                   width={256} 
                   height={256}

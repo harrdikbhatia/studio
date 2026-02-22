@@ -1,11 +1,10 @@
-
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense, use } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Navigation, MapPin, ChevronRight, Zap, ArrowUp, ArrowRight } from "lucide-react";
+import { Navigation, MapPin, Zap, ArrowUp, ArrowRight } from "lucide-react";
 import { InteractiveMap } from "@/components/parking/interactive-map";
 import { useSearchParams } from "next/navigation";
 
@@ -146,10 +145,11 @@ function InfoCard({ icon, title, desc }: any) {
   );
 }
 
-export default function SensorGuidancePage({ params }: { params: { id: string } }) {
+export default function SensorGuidancePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   return (
     <Suspense fallback={<div className="p-10 text-center">Loading guidance...</div>}>
-      <GuidanceContent id={params.id} />
+      <GuidanceContent id={id} />
     </Suspense>
   );
 }
