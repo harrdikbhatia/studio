@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "Smart urban parking facility with digital signage",
+      "imageUrl": "https://picsum.photos/seed/parkwise1/1200/600",
+      "imageHint": "smart parking"
+    },
+    {
+      "id": "feature-qr",
+      "description": "Phone scanning a QR code at a parking gate",
+      "imageUrl": "https://picsum.photos/seed/parkwise-qr/600/400",
+      "imageHint": "qr code"
+    },
+    {
+      "id": "feature-map",
+      "description": "Interactive map showing available parking spots",
+      "imageUrl": "https://picsum.photos/seed/parkwise-map/600/400",
+      "imageHint": "digital map"
+    }
+  ]
+}
