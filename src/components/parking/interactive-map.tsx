@@ -10,8 +10,7 @@ interface Slot {
   status: "available" | "occupied";
 }
 
-// Generate 20 slots for Section A and 20 for Section B (4 rows of 5 each)
-// Standardizing IDs with padStart to ensure "B04" matches "B04"
+// Generate 20 slots for Section A and 20 for Section B
 const BASE_SLOTS: Omit<Slot, "status">[] = [
   // Section A: Slots A01 - A20
   ...Array.from({ length: 20 }, (_, i) => ({
@@ -37,9 +36,10 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
   const [slots, setSlots] = useState<Slot[]>([]);
 
   useEffect(() => {
-    // Generate status randomly only on the client side after hydration
+    // Generate status randomly on mount
     const randomizedSlots: Slot[] = BASE_SLOTS.map((slot) => ({
       ...slot,
+      // Ensure the selected slot is "available" so we can see the transition
       status: Math.random() > 0.3 ? "available" : "occupied",
     }));
     setSlots(randomizedSlots);
@@ -52,33 +52,25 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
         className="w-full h-full max-w-md drop-shadow-lg"
         preserveAspectRatio="xMidYMid meet"
       >
-        {/* Parking Lot Structure */}
         <rect x="0" y="0" width="350" height="550" fill="#f8fafc" rx="10" />
-        
-        {/* Central Driveway */}
         <rect x="0" y="245" width="350" height="35" fill="#e2e8f0" />
-        
-        {/* Entrance Marker */}
         <path d="M 340 245 L 350 262 L 340 280" fill="none" stroke="#94a3b8" strokeWidth="2" />
 
-        {/* Section Labels */}
         <text x="10" y="15" fontSize="10" className="fill-muted-foreground font-bold uppercase tracking-widest">Section A (L1 North)</text>
         <text x="10" y="278" fontSize="10" className="fill-muted-foreground font-bold uppercase tracking-widest">Section B (L1 South)</text>
 
-        {/* Slots */}
         {slots.length > 0 ? (
           slots.map((slot) => {
-            const isTarget = selectedSlotId === slot.id;
-            // If we have arrived, the target slot should appear occupied
-            const isOccupied = slot.status === "occupied" || (isArrived && isTarget);
-            // Only show as "selected/pulsing" if we haven't arrived yet
+            const isTarget = selectedSlotId?.trim().toUpperCase() === slot.id.toUpperCase();
+            const isParked = isArrived && isTarget;
+            const isOccupied = slot.status === "occupied";
             const isSelected = !isArrived && isTarget;
             
             return (
               <g
                 key={slot.id}
                 onClick={() => !isOccupied && onSelectSlot?.(slot.id)}
-                className={isOccupied ? "cursor-not-allowed" : "cursor-pointer"}
+                className={isOccupied && !isTarget ? "cursor-not-allowed" : "cursor-pointer"}
               >
                 <rect
                   x={slot.x}
@@ -88,8 +80,10 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
                   rx="4"
                   strokeWidth="2"
                   className={cn(
-                    "transition-all duration-300",
-                    isOccupied ? "parking-slot-occupied" : (isSelected ? "parking-slot-selected" : "parking-slot-available")
+                    "transition-all duration-500",
+                    isParked ? "parking-slot-parked" : 
+                    isSelected ? "parking-slot-selected" : 
+                    isOccupied ? "parking-slot-occupied" : "parking-slot-available"
                   )}
                 />
                 <text
@@ -98,8 +92,8 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
                   textAnchor="middle"
                   fontSize="12"
                   className={cn(
-                    "font-bold select-none",
-                    isSelected ? "fill-white" : (isOccupied ? "fill-muted-foreground/50" : "fill-primary")
+                    "font-bold select-none transition-colors duration-500",
+                    isParked || isSelected ? "fill-white" : (isOccupied ? "fill-muted-foreground/50" : "fill-primary")
                   )}
                 >
                   {slot.id}
@@ -108,7 +102,6 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
             );
           })
         ) : (
-          /* Placeholder / Loading State for SSR */
           BASE_SLOTS.map((slot) => (
             <rect
               key={`placeholder-${slot.id}`}
@@ -125,12 +118,12 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
 
       <div className="absolute top-4 right-4 flex flex-col gap-2 bg-white/80 backdrop-blur p-2 rounded-lg border shadow-sm z-10">
         <div className="flex items-center gap-2 text-[10px] font-bold">
-          <div className="w-2 h-2 bg-accent rounded-sm" />
-          <span>Destination</span>
+          <div className="w-2 h-2 bg-green-500 rounded-sm" />
+          <span>Parked</span>
         </div>
         <div className="flex items-center gap-2 text-[10px] font-bold">
-          <div className="w-2 h-2 bg-accent/20 border border-accent rounded-sm" />
-          <span>Available</span>
+          <div className="w-2 h-2 bg-accent rounded-sm" />
+          <span>Navigating</span>
         </div>
         <div className="flex items-center gap-2 text-[10px] font-bold">
           <div className="w-2 h-2 bg-muted border border-muted-foreground rounded-sm" />
