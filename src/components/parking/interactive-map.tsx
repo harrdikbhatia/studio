@@ -10,19 +10,19 @@ interface Slot {
   status: "available" | "occupied";
 }
 
-// Generate slots for Section A and Section B
+// Generate 20 slots for Section A and 20 for Section B (4 rows of 5 each)
 const BASE_SLOTS: Omit<Slot, "status">[] = [
-  // Section A: 10 slots
-  ...Array.from({ length: 10 }, (_, i) => ({
+  // Section A: Slots A1 - A20
+  ...Array.from({ length: 20 }, (_, i) => ({
     id: `A${i + 1}`,
-    x: (i % 5) * 65 + 15,
-    y: Math.floor(i / 5) * 75 + 15,
+    x: (i % 5) * 65 + 25,
+    y: Math.floor(i / 5) * 55 + 25,
   })),
-  // Section B: 10 slots
-  ...Array.from({ length: 10 }, (_, i) => ({
+  // Section B: Slots B1 - B20
+  ...Array.from({ length: 20 }, (_, i) => ({
     id: `B${i + 1}`,
-    x: (i % 5) * 65 + 15,
-    y: Math.floor(i / 5) * 75 + 195,
+    x: (i % 5) * 65 + 25,
+    y: Math.floor(i / 5) * 55 + 285,
   })),
 ];
 
@@ -45,24 +45,24 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
   }, []);
 
   return (
-    <div className="relative w-full aspect-[4/3] bg-muted/5 rounded-xl border-2 border-dashed border-muted flex items-center justify-center p-4">
+    <div className="relative w-full aspect-[3/4] bg-muted/5 rounded-xl border-2 border-dashed border-muted flex items-center justify-center p-4">
       <svg
-        viewBox="0 0 350 350"
+        viewBox="0 0 350 550"
         className="w-full h-full max-w-md drop-shadow-lg"
         preserveAspectRatio="xMidYMid meet"
       >
         {/* Parking Lot Structure */}
-        <rect x="0" y="0" width="350" height="350" fill="#f8fafc" rx="10" />
+        <rect x="0" y="0" width="350" height="550" fill="#f8fafc" rx="10" />
         
         {/* Central Driveway */}
-        <rect x="0" y="160" width="350" height="30" fill="#e2e8f0" />
+        <rect x="0" y="245" width="350" height="35" fill="#e2e8f0" />
         
         {/* Entrance Marker */}
-        <path d="M 340 160 L 350 175 L 340 190" fill="none" stroke="#94a3b8" strokeWidth="2" />
+        <path d="M 340 245 L 350 262 L 340 280" fill="none" stroke="#94a3b8" strokeWidth="2" />
 
         {/* Section Labels */}
-        <text x="5" y="12" fontSize="8" className="fill-muted-foreground font-bold uppercase tracking-widest">Section A</text>
-        <text x="5" y="192" fontSize="8" className="fill-muted-foreground font-bold uppercase tracking-widest">Section B</text>
+        <text x="10" y="15" fontSize="10" className="fill-muted-foreground font-bold uppercase tracking-widest">Section A (L1 North)</text>
+        <text x="10" y="278" fontSize="10" className="fill-muted-foreground font-bold uppercase tracking-widest">Section B (L1 South)</text>
 
         {/* Slots */}
         {slots.length > 0 ? (
@@ -83,7 +83,7 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
                   x={slot.x}
                   y={slot.y}
                   width="50"
-                  height="60"
+                  height="45"
                   rx="4"
                   strokeWidth="2"
                   className={cn(
@@ -93,9 +93,9 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
                 />
                 <text
                   x={slot.x + 25}
-                  y={slot.y + 35}
+                  y={slot.y + 28}
                   textAnchor="middle"
-                  fontSize="10"
+                  fontSize="12"
                   className={cn(
                     "font-bold select-none",
                     isSelected ? "fill-white" : (isOccupied ? "fill-muted-foreground/50" : "fill-primary")
@@ -114,7 +114,7 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
               x={slot.x}
               y={slot.y}
               width="50"
-              height="60"
+              height="45"
               rx="4"
               className="fill-muted animate-pulse"
             />
@@ -122,10 +122,10 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false
         )}
       </svg>
 
-      <div className="absolute top-4 right-4 flex flex-col gap-2 bg-white/80 backdrop-blur p-2 rounded-lg border shadow-sm">
+      <div className="absolute top-4 right-4 flex flex-col gap-2 bg-white/80 backdrop-blur p-2 rounded-lg border shadow-sm z-10">
         <div className="flex items-center gap-2 text-[10px] font-bold">
           <div className="w-2 h-2 bg-accent rounded-sm" />
-          <span>Your Route</span>
+          <span>Destination</span>
         </div>
         <div className="flex items-center gap-2 text-[10px] font-bold">
           <div className="w-2 h-2 bg-accent/20 border border-accent rounded-sm" />
