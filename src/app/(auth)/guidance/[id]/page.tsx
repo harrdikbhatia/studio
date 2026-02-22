@@ -1,14 +1,17 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Navigation, MapPin, ChevronRight, Zap, ArrowUp, ArrowRight } from "lucide-react";
 import { InteractiveMap } from "@/components/parking/interactive-map";
+import { useSearchParams } from "next/navigation";
 
-export default function SensorGuidancePage({ params }: { params: { id: string } }) {
+function GuidanceContent({ id }: { id: string }) {
+  const searchParams = useSearchParams();
+  const slotId = searchParams.get("slot") || "A12";
   const [distance, setDistance] = useState(45);
   const [instruction, setInstruction] = useState("Drive forward 20 meters");
   const [phase, setPhase] = useState(0);
@@ -18,7 +21,7 @@ export default function SensorGuidancePage({ params }: { params: { id: string } 
       setDistance((prev) => {
         if (prev <= 2) {
           clearInterval(timer);
-          setInstruction("You have arrived! Park in Slot A12.");
+          setInstruction(`You have arrived! Park in Slot ${slotId}.`);
           setPhase(2);
           return 0;
         }
@@ -31,7 +34,7 @@ export default function SensorGuidancePage({ params }: { params: { id: string } 
     }, 400);
 
     return () => clearInterval(timer);
-  }, [phase]);
+  }, [phase, slotId]);
 
   return (
     <div className="container mx-auto px-6 py-8 max-w-4xl flex flex-col gap-6">
@@ -71,7 +74,7 @@ export default function SensorGuidancePage({ params }: { params: { id: string } 
             <div className="space-y-4">
               <div className="flex justify-between items-end">
                 <span className="text-4xl font-black font-mono">{distance}m</span>
-                <span className="text-sm text-white/50">to Slot A12</span>
+                <span className="text-sm text-white/50">to Slot {slotId}</span>
               </div>
               <Progress value={((45 - distance) / 45) * 100} className="bg-white/10" />
             </div>
@@ -98,7 +101,7 @@ export default function SensorGuidancePage({ params }: { params: { id: string } 
           </div>
           <CardContent className="p-4">
             <InteractiveMap 
-              selectedSlotId="A12" 
+              selectedSlotId={slotId} 
               onSelectSlot={() => {}} 
             />
           </CardContent>
@@ -120,7 +123,7 @@ export default function SensorGuidancePage({ params }: { params: { id: string } 
         <InfoCard 
           icon={<MapPin className="h-4 w-4 text-accent" />} 
           title="Final Destination" 
-          desc="Slot A12 reserved for check-in" 
+          desc={`Slot ${slotId} reserved for check-in`} 
         />
       </div>
     </div>
@@ -140,5 +143,13 @@ function InfoCard({ icon, title, desc }: any) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+export default function SensorGuidancePage({ params }: { params: { id: string } }) {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading guidance...</div>}>
+      <GuidanceContent id={params.id} />
+    </Suspense>
   );
 }
