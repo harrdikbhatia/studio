@@ -10,10 +10,21 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const NEAREST_SLOTS = [
-  { id: "A12", distance: "15m", level: "L1", type: "Standard" },
-  { id: "A15", distance: "22m", level: "L1", type: "EV Charging" },
-  { id: "B04", distance: "45m", level: "L1", type: "Standard" },
+// Pool of possible slots for simulation
+const SLOT_POOL = [
+  { id: "A02", level: "L1", type: "Standard" },
+  { id: "A05", level: "L1", type: "Standard" },
+  { id: "A08", level: "L1", type: "EV Charging" },
+  { id: "A12", level: "L1", type: "Standard" },
+  { id: "A15", level: "L1", type: "Standard" },
+  { id: "A18", level: "L1", type: "Standard" },
+  { id: "B03", level: "L1", type: "Standard" },
+  { id: "B04", level: "L1", type: "Standard" },
+  { id: "B07", level: "L1", type: "Standard" },
+  { id: "B10", level: "L1", type: "EV Charging" },
+  { id: "B12", level: "L1", type: "Standard" },
+  { id: "B15", level: "L1", type: "Standard" },
+  { id: "B19", level: "L1", type: "Standard" },
 ];
 
 export default function ReservationDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -21,6 +32,7 @@ export default function ReservationDetail({ params }: { params: Promise<{ id: st
   const [countdown, setCountdown] = useState(15 * 60);
   const [step, setStep] = useState<"qr" | "scanning" | "select">("qr");
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [nearestSlots, setNearestSlots] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,6 +41,18 @@ export default function ReservationDetail({ params }: { params: Promise<{ id: st
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Pick 3 random slots from the pool when entering the selection phase
+  useEffect(() => {
+    if (step === "select") {
+      const shuffled = [...SLOT_POOL].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 3).map((slot, idx) => ({
+        ...slot,
+        distance: `${(idx + 1) * 12 + Math.floor(Math.random() * 5)}m`
+      }));
+      setNearestSlots(selected);
+    }
+  }, [step]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -60,12 +84,12 @@ export default function ReservationDetail({ params }: { params: Promise<{ id: st
           <Badge className="bg-accent/10 text-accent border-none animate-pulse">
             {step === "select" ? "Spot Selection" : "Garage Check-in Pass"}
           </Badge>
-          <h1 className="text-3xl font-bold font-headline">
+          <h1 className="text-3xl font-bold font-headline text-primary">
             {step === "select" ? "Find Your Vacancy" : "Smart Access Entry"}
           </h1>
           <p className="text-sm text-muted-foreground max-w-sm mx-auto">
             {step === "select" 
-              ? "Scanning was successful. Choose one of the nearest available spots to start floor guidance." 
+              ? "Scanning successful. Choose one of the nearest available spots to start floor guidance." 
               : "Scan this QR code at the entrance to see real-time available spots near you."}
           </p>
         </div>
@@ -125,9 +149,9 @@ export default function ReservationDetail({ params }: { params: Promise<{ id: st
                 <MapPin className="h-5 w-5 text-accent" />
                 Nearby Vacancies
               </h2>
-              <Badge variant="outline" className="text-[10px] font-bold">L1 SECTION A</Badge>
+              <Badge variant="outline" className="text-[10px] font-bold">LIVE SENSOR DATA</Badge>
             </div>
-            {NEAREST_SLOTS.map((slot) => (
+            {nearestSlots.map((slot) => (
               <Card 
                 key={slot.id} 
                 onClick={() => setSelectedSlot(slot.id)}
@@ -149,7 +173,7 @@ export default function ReservationDetail({ params }: { params: Promise<{ id: st
                         <span className="font-black text-xl">{slot.distance} away</span>
                         <Badge variant="outline" className="text-[10px] font-bold h-5 px-2 bg-white">{slot.type}</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{slot.level} • NORTH SECTION</p>
+                      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{slot.level} • {slot.id.startsWith('A') ? 'NORTH' : 'SOUTH'} SECTION</p>
                     </div>
                   </div>
                   {selectedSlot === slot.id && (
