@@ -1,15 +1,18 @@
 "use client";
 
 import React, { useEffect, useState, Suspense, use } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Navigation, MapPin, Zap, ArrowUp, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Navigation, MapPin, Zap, ArrowUp, ArrowRight, CheckCircle2 } from "lucide-react";
 import { InteractiveMap } from "@/components/parking/interactive-map";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 
 function GuidanceContent({ id }: { id: string }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const slotId = searchParams.get("slot") || "A12";
   const [distance, setDistance] = useState(45);
   const [instruction, setInstruction] = useState("Drive forward 20 meters");
@@ -30,7 +33,7 @@ function GuidanceContent({ id }: { id: string }) {
         }
         return prev - 1;
       });
-    }, 400);
+    }, 200);
 
     return () => clearInterval(timer);
   }, [phase, slotId]);
@@ -40,32 +43,34 @@ function GuidanceContent({ id }: { id: string }) {
       <div className="flex justify-between items-center">
         <div className="flex flex-col">
           <h1 className="text-2xl font-bold font-headline flex items-center gap-2">
-            <Zap className="text-accent h-6 w-6 animate-pulse" />
-            Live Sensor Guidance
+            <Zap className={`h-6 w-6 ${phase === 2 ? "text-green-500" : "text-accent animate-pulse"}`} />
+            {phase === 2 ? "Arrival Complete" : "Live Sensor Guidance"}
           </h1>
-          <p className="text-sm text-muted-foreground">Follow the floor sensors to your spot</p>
+          <p className="text-sm text-muted-foreground">
+            {phase === 2 ? `You are now parked in slot ${slotId}` : "Follow the floor sensors to your spot"}
+          </p>
         </div>
-        <Badge variant="outline" className="border-accent text-accent animate-pulse">
-          Syncing with Level 1 Sensors
+        <Badge variant={phase === 2 ? "default" : "outline"} className={phase === 2 ? "bg-green-500 hover:bg-green-600 border-none" : "border-accent text-accent animate-pulse"}>
+          {phase === 2 ? "Session Active" : "Syncing with Floor Sensors"}
         </Badge>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Navigation HUD */}
-        <Card className="lg:col-span-1 bg-primary text-white border-none shadow-2xl overflow-hidden flex flex-col justify-between">
+        <Card className={`lg:col-span-1 border-none shadow-2xl overflow-hidden flex flex-col justify-between transition-colors duration-500 ${phase === 2 ? "bg-green-600" : "bg-primary"} text-white`}>
           <div className="p-6">
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center shadow-inner">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-inner transition-colors duration-500 ${phase === 2 ? "bg-white/20" : "bg-accent"}`}>
                 {phase === 0 ? (
                   <ArrowUp className="h-7 w-7 text-white" />
                 ) : phase === 1 ? (
                   <ArrowRight className="h-7 w-7 text-white" />
                 ) : (
-                  <MapPin className="h-7 w-7 text-white" />
+                  <CheckCircle2 className="h-7 w-7 text-white" />
                 )}
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] text-white/50 uppercase tracking-widest font-bold">Next Instruction</span>
+                <span className="text-[10px] text-white/50 uppercase tracking-widest font-bold">Status</span>
                 <span className="text-lg font-bold leading-tight">{instruction}</span>
               </div>
             </div>
@@ -80,13 +85,21 @@ function GuidanceContent({ id }: { id: string }) {
           </div>
 
           <div className="bg-white/5 p-6 border-t border-white/10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span className="text-xs font-bold uppercase tracking-wider">Aisle B Sensors</span>
+            {phase === 2 ? (
+              <Link href="/dashboard" className="w-full">
+                <Button variant="secondary" className="w-full bg-white text-green-600 hover:bg-white/90 font-bold">
+                  Exit Guidance
+                </Button>
+              </Link>
+            ) : (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="text-xs font-bold uppercase tracking-wider">Aisle B Sensors</span>
+                </div>
+                <span className="text-xs text-white/50">100% Signal</span>
               </div>
-              <span className="text-xs text-white/50">100% Signal</span>
-            </div>
+            )}
           </div>
         </Card>
 
@@ -94,14 +107,14 @@ function GuidanceContent({ id }: { id: string }) {
         <Card className="lg:col-span-2 shadow-sm relative overflow-hidden">
           <div className="absolute top-4 left-4 z-10">
             <Badge className="bg-white/90 text-primary hover:bg-white border-none shadow-sm flex gap-2">
-              <div className="w-2 h-2 rounded-full bg-accent animate-ping" />
-              Tracking Vehicle
+              <div className={`w-2 h-2 rounded-full ${phase === 2 ? "bg-green-500" : "bg-accent animate-ping"}`} />
+              {phase === 2 ? "Vehicle Parked" : "Tracking Vehicle"}
             </Badge>
           </div>
           <CardContent className="p-4">
             <InteractiveMap 
               selectedSlotId={slotId} 
-              onSelectSlot={() => {}} 
+              isArrived={phase === 2}
             />
           </CardContent>
         </Card>
@@ -110,19 +123,19 @@ function GuidanceContent({ id }: { id: string }) {
       {/* Sensor Info */}
       <div className="grid md:grid-cols-3 gap-4">
         <InfoCard 
-          icon={<Zap className="h-4 w-4 text-accent" />} 
+          icon={<Zap className={`h-4 w-4 ${phase === 2 ? "text-green-500" : "text-accent"}`} />} 
           title="Floor Sensors" 
-          desc="Lighting the path every 2 meters" 
+          desc={phase === 2 ? "Sensor reporting occupancy" : "Lighting the path every 2 meters"} 
         />
         <InfoCard 
-          icon={<Navigation className="h-4 w-4 text-accent" />} 
+          icon={<Navigation className={`h-4 w-4 ${phase === 2 ? "text-green-500" : "text-accent"}`} />} 
           title="Turn Signals" 
-          desc="Directional indicators active" 
+          desc={phase === 2 ? "Signals deactivated" : "Directional indicators active"} 
         />
         <InfoCard 
-          icon={<MapPin className="h-4 w-4 text-accent" />} 
-          title="Final Destination" 
-          desc={`Slot ${slotId} reserved for check-in`} 
+          icon={<MapPin className={`h-4 w-4 ${phase === 2 ? "text-green-500" : "text-accent"}`} />} 
+          title="Spot Occupied" 
+          desc={`Slot ${slotId} state confirmed`} 
         />
       </div>
     </div>
@@ -148,7 +161,7 @@ function InfoCard({ icon, title, desc }: any) {
 export default function SensorGuidancePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   return (
-    <Suspense fallback={<div className="p-10 text-center">Loading guidance...</div>}>
+    <Suspense fallback={<div className="p-10 text-center text-muted-foreground">Initializing live guidance...</div>}>
       <GuidanceContent id={id} />
     </Suspense>
   );

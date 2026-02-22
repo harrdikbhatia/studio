@@ -10,15 +10,15 @@ interface Slot {
   status: "available" | "occupied";
 }
 
-// Generate slots for Section A (Top) and Section B (Bottom)
+// Generate slots for Section A and Section B
 const BASE_SLOTS: Omit<Slot, "status">[] = [
-  // Section A: 10 slots (2 rows of 5)
+  // Section A: 10 slots
   ...Array.from({ length: 10 }, (_, i) => ({
     id: `A${i + 1}`,
     x: (i % 5) * 65 + 15,
     y: Math.floor(i / 5) * 75 + 15,
   })),
-  // Section B: 10 slots (2 rows of 5)
+  // Section B: 10 slots
   ...Array.from({ length: 10 }, (_, i) => ({
     id: `B${i + 1}`,
     x: (i % 5) * 65 + 15,
@@ -27,11 +27,12 @@ const BASE_SLOTS: Omit<Slot, "status">[] = [
 ];
 
 interface InteractiveMapProps {
-  onSelectSlot: (slotId: string) => void;
+  onSelectSlot?: (slotId: string) => void;
   selectedSlotId: string | null;
+  isArrived?: boolean;
 }
 
-export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapProps) {
+export function InteractiveMap({ onSelectSlot, selectedSlotId, isArrived = false }: InteractiveMapProps) {
   const [slots, setSlots] = useState<Slot[]>([]);
 
   useEffect(() => {
@@ -66,14 +67,17 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapP
         {/* Slots */}
         {slots.length > 0 ? (
           slots.map((slot) => {
-            const isSelected = selectedSlotId === slot.id;
-            const isOccupied = slot.status === "occupied";
+            const isTarget = selectedSlotId === slot.id;
+            // If we have arrived, the target slot should appear occupied
+            const isOccupied = slot.status === "occupied" || (isArrived && isTarget);
+            // Only show as "selected/pulsing" if we haven't arrived yet
+            const isSelected = !isArrived && isTarget;
             
             return (
               <g
                 key={slot.id}
-                onClick={() => !isOccupied && onSelectSlot(slot.id)}
-                className="cursor-pointer"
+                onClick={() => !isOccupied && onSelectSlot?.(slot.id)}
+                className={isOccupied ? "cursor-not-allowed" : "cursor-pointer"}
               >
                 <rect
                   x={slot.x}
@@ -121,7 +125,7 @@ export function InteractiveMap({ onSelectSlot, selectedSlotId }: InteractiveMapP
       <div className="absolute top-4 right-4 flex flex-col gap-2 bg-white/80 backdrop-blur p-2 rounded-lg border shadow-sm">
         <div className="flex items-center gap-2 text-[10px] font-bold">
           <div className="w-2 h-2 bg-accent rounded-sm" />
-          <span>Selected</span>
+          <span>Your Route</span>
         </div>
         <div className="flex items-center gap-2 text-[10px] font-bold">
           <div className="w-2 h-2 bg-accent/20 border border-accent rounded-sm" />
