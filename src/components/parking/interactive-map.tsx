@@ -11,16 +11,17 @@ interface Slot {
 }
 
 // Generate 20 slots for Section A and 20 for Section B (4 rows of 5 each)
+// Standardizing IDs with padStart to ensure "B04" matches "B04"
 const BASE_SLOTS: Omit<Slot, "status">[] = [
-  // Section A: Slots A1 - A20
+  // Section A: Slots A01 - A20
   ...Array.from({ length: 20 }, (_, i) => ({
-    id: `A${i + 1}`,
+    id: `A${String(i + 1).padStart(2, "0")}`,
     x: (i % 5) * 65 + 25,
     y: Math.floor(i / 5) * 55 + 25,
   })),
-  // Section B: Slots B1 - B20
+  // Section B: Slots B01 - B20
   ...Array.from({ length: 20 }, (_, i) => ({
-    id: `B${i + 1}`,
+    id: `B${String(i + 1).padStart(2, "0")}`,
     x: (i % 5) * 65 + 25,
     y: Math.floor(i / 5) * 55 + 285,
   })),
