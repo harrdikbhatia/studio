@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, QrCode, Clock, Sparkles, ChevronRight } from "lucide-react";
+import { QrCode, Clock, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export default function Dashboard() {
@@ -57,24 +57,18 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href={`/reservation/${activePass.id}`} className="flex-1">
+            <div className="flex flex-col gap-4">
+              <Link href={`/reservation/${activePass.id}`} className="w-full">
                 <Button className="w-full bg-accent hover:bg-accent/90 text-white h-14 text-lg font-bold shadow-lg shadow-accent/20">
                   <QrCode className="mr-2 h-5 w-5" />
                   Show QR & Book Spot
-                </Button>
-              </Link>
-              <Link href="/map" className="flex-1">
-                <Button variant="outline" className="w-full text-white border-white/30 hover:bg-white/10 h-14 font-semibold">
-                  <MapPin className="mr-2 h-5 w-5" />
-                  Switch Facility
                 </Button>
               </Link>
             </div>
           </CardContent>
         </Card>
 
-        {/* AI & Insights Section - Simplified */}
+        {/* AI & Insights Section */}
         <div className="grid grid-cols-1 gap-6">
           <Card className="bg-muted/30 border-none">
             <CardContent className="p-6">
@@ -104,7 +98,7 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <h4 className="font-medium text-sm">Central Mall Garage</h4>
-                    <p className="text-xs text-muted-foreground">Slot B{i * 2} • Oct {10 + i}, 2023</p>
+                    <p className="text-xs text-muted-foreground">Slot B{String(i * 2).padStart(2, '0')} • Oct {10 + i}, 2023</p>
                   </div>
                 </div>
                 <div className="text-right">

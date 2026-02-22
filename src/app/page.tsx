@@ -45,9 +45,9 @@ export default function LandingPage() {
               Pre-book your spot with QR-based instant access.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/map">
+              <Link href="/dashboard">
                 <Button size="lg" className="bg-accent hover:bg-accent/90 text-white w-full sm:w-auto h-12 px-8">
-                  Find a Spot
+                  Get Started
                 </Button>
               </Link>
               <Link href="/dashboard">
@@ -59,13 +59,13 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Core Values / Design Thinking */}
+        {/* Core Values */}
         <section className="py-20 bg-background">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold mb-4 font-headline">Design-First Engineering</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Built on the five stages of design thinking to address the core pain points of urban commuters.
+                Built to address the core pain points of urban commuters through real-time technology.
               </p>
             </div>
 
@@ -77,7 +77,7 @@ export default function LandingPage() {
                   </div>
                   <h3 className="text-xl font-semibold mb-2">Predictability</h3>
                   <p className="text-sm text-muted-foreground">
-                    Guaranteed spots before you even leave home. Reduce anxiety and reach your destination on time.
+                    Guaranteed spots identified by floor sensors as soon as you arrive.
                   </p>
                 </CardContent>
               </Card>
@@ -89,7 +89,7 @@ export default function LandingPage() {
                   </div>
                   <h3 className="text-xl font-semibold mb-2">Instant Access</h3>
                   <p className="text-sm text-muted-foreground">
-                    Contactless QR entry. No tickets, no paper, no hardware tokens needed. Just your phone.
+                    Contactless QR entry. No tickets, no paper. Just your phone and instant guidance.
                   </p>
                 </CardContent>
               </Card>
@@ -101,7 +101,7 @@ export default function LandingPage() {
                   </div>
                   <h3 className="text-xl font-semibold mb-2">Total Security</h3>
                   <p className="text-sm text-muted-foreground">
-                    Cryptographically signed reservations and monitored facilities ensure your vehicle is safe.
+                    Integrated floor sensors confirm your vehicle's presence and security in real-time.
                   </p>
                 </CardContent>
               </Card>
@@ -124,9 +124,9 @@ export default function LandingPage() {
           <div>
             <h4 className="font-bold mb-4">Product</h4>
             <ul className="text-sm text-gray-400 space-y-2">
-              <li>Mobile Booking</li>
-              <li>AI Predictions</li>
-              <li>Enterprise Solutions</li>
+              <li>Smart Access</li>
+              <li>Floor Guidance</li>
+              <li>Facility Control</li>
             </ul>
           </div>
           <div>

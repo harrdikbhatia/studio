@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Map, LayoutDashboard, User } from "lucide-react";
+import { LayoutDashboard, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function BottomNav() {
@@ -10,7 +10,6 @@ export function BottomNav() {
 
   const navItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
-    { href: "/map", icon: Map, label: "Map" },
     { href: "/admin", icon: User, label: "Admin" },
   ];
 
